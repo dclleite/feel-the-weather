@@ -11,6 +11,7 @@ type TextInputBoxProps = {
   onChangeText: (value: string) => void
   onPress: () => void
   buttonTitle: string
+  isLoading: boolean
   reference?: (inputRef: React.RefObject<TextInput>) => void
 }
 
@@ -20,6 +21,7 @@ export function TextInputBox({
   onChangeText,
   buttonTitle,
   onPress,
+  isLoading = false,
   reference
 }: TextInputBoxProps){
   const inputRef = useRef<TextInput>(null)
@@ -41,6 +43,7 @@ export function TextInputBox({
       <Button 
         title={buttonTitle}
         onPress={onPress} 
+        isLoading={isLoading}
       />
 
     </View>

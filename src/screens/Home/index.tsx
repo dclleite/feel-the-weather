@@ -1,21 +1,25 @@
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import React, { useEffect, useState } from 'react'
 
 import { View, Text, TextInput, Keyboard, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { TextInputBox } from '../../components/TextInputBox'
 import { useWeather } from '../../hooks/useWeather'
+import { NavigationProps } from '../../navigation'
 
 import { styles } from './styles'
 
-export function Home(){
+
+
+export function Home({ navigation }: NavigationProps){
   const [nameCity, setNameCity] =  useState('')
   const [inputRef, setInputRef] = useState<React.RefObject<TextInput> | null>(null)
   
-  const {isSearching, setIsSearching, searchCity} = useWeather()
+  const {isTypingCityName, setIsTypingCityName, isSearching, searchCity} = useWeather()
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener('keyboardDidHide', () => {
-      setIsSearching(false)
+      setIsTypingCityName(false)
       setNameCity('')
     })
 
@@ -25,7 +29,7 @@ export function Home(){
   }, [])
 
   useEffect(() => {
-    if(isSearching) {
+    if(isTypingCityName) {
       inputRef?.current?.focus()
     }
   }, [inputRef])
@@ -45,22 +49,26 @@ export function Home(){
   }
 
   function renderTextInputBox() {
-    if(isSearching) {
+    if(isTypingCityName) {
       return (
         <KeyboardAvoidingView
           style={{width: '100%'}} 
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
-       
           <TextInputBox 
             value={nameCity}
             placeholder="Pesquise uma cidade"
             onChangeText={setNameCity}
             reference={(ref) => setInputRef(ref) }
             buttonTitle='Pesquisar'
-            onPress={() => searchCity(nameCity)}
+            isLoading={isSearching}
+            onPress={() => {
+              if(nameCity) {
+                navigation.navigate('SearchScreen')
+                searchCity(nameCity)
+              }
+            }}
           />
-  
         </KeyboardAvoidingView>
        
       )

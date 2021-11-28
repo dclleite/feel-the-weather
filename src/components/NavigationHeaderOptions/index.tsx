@@ -27,7 +27,7 @@ export default function NavigationHeaderOptions({ title, category = 'default', o
   function headerLeft() {
     if(category === 'close-button') {
       return (
-        <MaterialIcons.Button name='close' size={16} color={COLORS.WHITE_SMOKE} onPress={onPress} />
+        <MaterialIcons name='close' size={16} color={COLORS.WHITE_SMOKE} onPress={onPress} />
       ) 
     } else if(category === 'back-button') {
       return (

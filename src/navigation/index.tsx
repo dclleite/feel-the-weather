@@ -1,23 +1,27 @@
 import React from 'react'
 import { NavigationContainer } from '@react-navigation/native'
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { createNativeStackNavigator, NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Home } from '../screens/Home'
 import NavigationHeaderOptions from '../components/NavigationHeaderOptions'
-import { Text, View } from 'react-native'
 import { useWeather } from '../hooks/useWeather'
+import { SearchScreen } from '../screens/SearchScreen'
 
 const Stack = createNativeStackNavigator()
 
-
-
 export default function Navigation() {
-  const {setIsSearching} = useWeather()
+  const {setIsTypingCityName, searchCityName} = useWeather()
   return (
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen name="Home" component={Home} options={{ 
           ...NavigationHeaderOptions({title: 'Cidades', onPress: () => {
-            setIsSearching && setIsSearching(true)
+            setIsTypingCityName && setIsTypingCityName(true)
+          }}),
+        }} 
+        />
+        <Stack.Screen name="SearchScreen" component={SearchScreen} options={{ 
+          ...NavigationHeaderOptions({title: searchCityName, category:'close-button', onPress: () => {
+            // setIsSearching && setIsSearching(true)
           }}),
         }} 
         />
@@ -25,3 +29,10 @@ export default function Navigation() {
     </NavigationContainer>
   )
 }
+
+type RootStackParamList = {
+  Home: undefined
+  SearchScreen: undefined
+};
+
+export type NavigationProps = NativeStackScreenProps<RootStackParamList>

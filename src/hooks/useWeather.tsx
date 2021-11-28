@@ -2,8 +2,10 @@ import React, { useContext, createContext, useState } from 'react'
 import { getCities } from '../../geodbApi'
 
 type WeatherContextData = {
-  setIsSearching: (isSearching: boolean) => void
+  isTypingCityName: boolean,
+  setIsTypingCityName: (isTypingCityName: boolean) => void
   isSearching: boolean
+  setIsSearching: (isSearching: boolean) => void
   searchCity: (cityName: string) => void
   searchCityName: string
   citiesFound: CityData[]
@@ -30,13 +32,16 @@ export const WeatherContext = createContext({} as WeatherContextData)
 function WeatherProvider({ children }: WeatherProviderProps) {
   const [searchCityName, setSearchCityName] = useState('')
   const [citiesFound, setCitiesFound] = useState<CityData[]>([])
+  const [isTypingCityName, setIsTypingCityName] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
 
   async function searchCity(cityName: string) {
     if(cityName) {
       try {
+        setIsSearching(true)
         setSearchCityName(cityName)
         const { data: CitiesResponse } = await getCities(cityName)
+        setIsTypingCityName(false)
         console.log(CitiesResponse)
         setCitiesFound(CitiesResponse)
       } catch (error) {
@@ -50,6 +55,8 @@ function WeatherProvider({ children }: WeatherProviderProps) {
 
   return (
     <WeatherContext.Provider value={{
+      isTypingCityName,
+      setIsTypingCityName,
       setIsSearching,
       isSearching,
       searchCity,
