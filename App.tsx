@@ -1,7 +1,25 @@
-import { StatusBar } from 'expo-status-bar'
 import React from 'react'
+import { StatusBar } from 'expo-status-bar'
 import { Text, View } from 'react-native'
+
 import useCachedResources from './src/hooks/useCachedResources'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
+import Navigation from './src/navigation'
+
+
+function teste() {
+
+  return {
+    headerTitle: () => {
+
+      return (
+        <View style={{flex: 1, justifyContent: 'flex-start', backgroundColor: 'red', margin: 0}}>
+          <Text>Home</Text>
+        </View>
+      )
+    }
+  }
+}
 
 export default function App() {
   const isLoadingComplete = useCachedResources()
@@ -10,10 +28,10 @@ export default function App() {
     return null
   } else {
     return (
-      <View >
-        <Text>Open up App.tsx to start working on your app!</Text>
-        <StatusBar style="auto" />
-      </View>
+      <SafeAreaProvider>
+        <Navigation />
+        <StatusBar />
+      </SafeAreaProvider>
     )
   }
 }
