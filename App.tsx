@@ -30,7 +30,11 @@ export default function App() {
     return (
       <SafeAreaProvider>
         <Navigation />
-        <StatusBar />
+        <StatusBar          
+          style="light" 
+          translucent
+          backgroundColor="transparent"  
+        />
       </SafeAreaProvider>
     )
   }

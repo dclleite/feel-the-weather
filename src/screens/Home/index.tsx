@@ -8,7 +8,7 @@ import { styles } from './styles'
 export function Home(){
   return (
     <SafeAreaView>
-      <Text>teste da home</Text>
+      <Text>Home</Text>
     </SafeAreaView>
   )
 }
