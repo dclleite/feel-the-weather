@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import * as SplashScreen from 'expo-splash-screen'
 import * as Font from 'expo-font'
-import { FontAwesome } from '@expo/vector-icons'
+import { MaterialIcons } from '@expo/vector-icons'
 
 export default function useCachedResources() {
   const [isLoadingComplete, setLoadingComplete] = useState(false)
@@ -12,7 +12,7 @@ export default function useCachedResources() {
         await SplashScreen.preventAutoHideAsync()
 
         await Font.loadAsync({
-          ...FontAwesome.font,
+          ...MaterialIcons.font,
           'Roboto-Regular': require('../../assets/fonts/Roboto-Regular.ttf'),
           'Roboto-Medium': require('../../assets/fonts/Roboto-Medium.ttf')
         })
