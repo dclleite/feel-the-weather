@@ -1,14 +1,16 @@
 import React, { useContext, createContext, useState } from 'react'
-import { getCities } from '../../geodbApi'
+import { getCities } from '../services/geodbApi'
 
 type WeatherContextData = {
   isTypingCityName: boolean,
   setIsTypingCityName: (isTypingCityName: boolean) => void
   isSearching: boolean
   setIsSearching: (isSearching: boolean) => void
-  searchCity: (cityName: string) => void
+  searchCity: (cityName: string, callback?: () => void) => void
   searchCityName: string
   citiesFound: CityData[]
+  currentCityList: CityData[]
+  addCity: (city: CityData) => void
 }
 
 type WeatherProviderProps = {
@@ -32,25 +34,33 @@ export const WeatherContext = createContext({} as WeatherContextData)
 function WeatherProvider({ children }: WeatherProviderProps) {
   const [searchCityName, setSearchCityName] = useState('')
   const [citiesFound, setCitiesFound] = useState<CityData[]>([])
+  const [currentCityList, setCurrentCityList] = useState<CityData[]>([])
+
   const [isTypingCityName, setIsTypingCityName] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
 
-  async function searchCity(cityName: string) {
+  async function searchCity(cityName: string, callback?: () => void) {
     if(cityName) {
       try {
         setIsSearching(true)
         setSearchCityName(cityName)
-        const { data: CitiesResponse } = await getCities(cityName)
+        const {data: response} = await getCities(cityName)
         setIsTypingCityName(false)
-        console.log(CitiesResponse)
-        setCitiesFound(CitiesResponse)
+        setCitiesFound(response.data)
+        callback && callback()
       } catch (error) {
         console.warn(error)
       } finally {
         setIsSearching(false)
       }
     }
-    
+  }
+
+  function addCity(city: CityData) {
+    setCurrentCityList([
+      ...currentCityList,
+      city,
+    ])
   }
 
   return (
@@ -61,7 +71,9 @@ function WeatherProvider({ children }: WeatherProviderProps) {
       isSearching,
       searchCity,
       searchCityName,
-      citiesFound
+      citiesFound,
+      currentCityList,
+      addCity,
     }}>
       {children}
     </WeatherContext.Provider>

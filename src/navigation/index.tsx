@@ -23,6 +23,7 @@ export default function Navigation() {
           ...NavigationHeaderOptions({title: searchCityName, category:'close-button', onPress: () => {
             // setIsSearching && setIsSearching(true)
           }}),
+          
         }} 
         />
       </Stack.Navigator>

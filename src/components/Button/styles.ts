@@ -3,16 +3,19 @@ import { COLORS, FONTS } from '../../tokens'
 
 export const styles = StyleSheet.create({
   button: {
-    height: 48,
-    width: '100%',
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.ORANGE,
+  },
+  buttonDefault: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+  },
+  buttonContainer: {
+    width: '100%',
+    padding: 16,
   },
   title: {
     fontSize: 16,
     fontFamily: FONTS.ROBOTO_MEDIUM,
-    color: COLORS.WHITE
   }
 })

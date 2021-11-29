@@ -1,4 +1,4 @@
-import React from 'react'
+import * as React from 'react'
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
 import { MaterialIcons } from '@expo/vector-icons'
 import { View , Text} from 'react-native'
@@ -27,7 +27,7 @@ export default function NavigationHeaderOptions({ title, category = 'default', o
   function headerLeft() {
     if(category === 'close-button') {
       return (
-        <MaterialIcons name='close' size={16} color={COLORS.WHITE_SMOKE} onPress={onPress} />
+        <MaterialIcons name='close' size={18} color={COLORS.WHITE_SMOKE} onPress={onPress} />
       ) 
     } else if(category === 'back-button') {
       return (

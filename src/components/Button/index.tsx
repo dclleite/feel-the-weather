@@ -1,17 +1,23 @@
-import React from 'react'
+import * as React from 'react'
 
 import { ActivityIndicator, Text, TouchableOpacity, TouchableOpacityProps } from 'react-native'
+import { COLORS } from '../../tokens'
 
 import { styles } from './styles'
 
 type Props = TouchableOpacityProps & {
   title: string
+  category?: 'default' | 'container'
+  appearance?: 'primary' | 'secondary'
   isLoading?: boolean
 }
 
 export function Button({
   title, 
+  category = 'default',
+  appearance = 'primary',
   isLoading = false,
+  style,
   ...rest
 }: Props){
 
@@ -21,7 +27,10 @@ export function Button({
     }
 
     return (
-      <Text style={[styles.title]}>
+      <Text style={[
+        styles.title,
+        {color: appearance === 'primary' ? COLORS.WHITE : COLORS.AZURE}
+      ]}>
         {title}
       </Text>
     )
@@ -29,7 +38,12 @@ export function Button({
 
   return (
     <TouchableOpacity
-      style={[styles.button]}
+      style={[
+        styles.button, 
+        style,
+        category === 'default' ? styles.buttonDefault : styles.buttonContainer,
+        {backgroundColor: appearance === 'primary' ? COLORS.AZURE : COLORS.WHITE}
+      ]}
       activeOpacity={0.7}
       disabled={isLoading}
       {...rest}
