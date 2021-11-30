@@ -8,9 +8,10 @@ import {
   KeyboardAvoidingView, 
   Platform, 
   ScrollView, 
-  FlatList 
+  FlatList, 
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { Loader } from '../../components/Loader'
 import { TextInputBox } from '../../components/TextInputBox'
 import { WeatherDetailsCard } from '../../components/WeatherDetailsCard'
 import { useWeather } from '../../hooks/useWeather'
@@ -29,7 +30,8 @@ export function Home({ navigation }: NavigationProps){
     setIsTypingCityName, 
     isSearching, 
     searchCity, 
-    citiesWeatherForecast
+    citiesWeatherForecast,
+    isLoadStorageData
   } = useWeather()
 
   useEffect(() => {
@@ -116,13 +118,17 @@ export function Home({ navigation }: NavigationProps){
     }
   }
 
+  if(isLoadStorageData) {
+    return (
+      <Loader size='large' />
+    )
+  }
+
   return (
     <SafeAreaView style={styles.container} edges={['bottom']} >
       {renderEmptyList()}
-
       {renderCards()}
       {renderTextInputBox()}
-
     </SafeAreaView>
    
   )

@@ -21,5 +21,5 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     color: COLORS.BLACK_60
-  }
+  },
 })

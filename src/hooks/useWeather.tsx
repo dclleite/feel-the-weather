@@ -1,4 +1,5 @@
-import React, { useContext, createContext, useState, useEffect } from 'react'
+import React, { useContext, createContext, useState, useEffect, forwardRef } from 'react'
+import * as SplashScreen from 'expo-splash-screen'
 import { getCities } from '../services/geodbApi'
 import { getWeatherOneCall, WeatherOneCallResponse } from '../services/openWeatherApi'
 import { getStoreData, setStoreData } from '../services/storeApi'
@@ -14,7 +15,8 @@ type WeatherContextData = {
   citiesFound: CityData[]
   currentCityList: CityData[]
   addCity: (city: CityData) => void
-  citiesWeatherForecast: WeatherForecast[] 
+  citiesWeatherForecast: WeatherForecast[],
+  isLoadStorageData: boolean
 }
 
 type WeatherProviderProps = {
@@ -48,6 +50,7 @@ function WeatherProvider({ children }: WeatherProviderProps) {
 
   const [isTypingCityName, setIsTypingCityName] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
+  const [isLoadStorageData, setIsLoadStorageData] = useState(false)
 
   async function searchCity(cityName: string, callback?: () => void) {
     if(cityName) {
@@ -111,22 +114,30 @@ function WeatherProvider({ children }: WeatherProviderProps) {
 
   useEffect(() => {
     async function loadStorageData() {
-      const currentCitiesListStorage = await getStoreData<CityData[]>(STORE_KEYS.CHOSEN_CITIES)
+      try {
+        setIsLoadStorageData(true)
+        const currentCitiesListStorage = await getStoreData<CityData[]>(STORE_KEYS.CHOSEN_CITIES)
 
-      if(currentCitiesListStorage?.length) {
+        if(currentCitiesListStorage?.length) {
 
-        currentCitiesListStorage.forEach(async (cityStorage) => {
-          const weatherForecast = await getWeatherForecast(cityStorage)
-
-          if(weatherForecast) {
-            setCitiesWeatherForecast((prevState) => [
-              ...prevState, 
-              weatherForecast
-            ])
+          for await (const cityStorage of currentCitiesListStorage) {
+            if(!citiesWeatherForecast.some(weatherForecast => weatherForecast.city.id === cityStorage.id)) {
+              const weatherForecast = await getWeatherForecast(cityStorage)
+              if(weatherForecast) {
+                setCitiesWeatherForecast((prevState) => [
+                  ...prevState, 
+                  weatherForecast
+                ])
+              }
+            }
           }
-        })
-
-        setCurrentCityList(currentCitiesListStorage)
+          
+          setCurrentCityList(currentCitiesListStorage)
+        }
+      } catch (error) {
+        console.warn(error)
+      } finally {
+        setIsLoadStorageData(false)
       }
     }
 
@@ -145,6 +156,7 @@ function WeatherProvider({ children }: WeatherProviderProps) {
       currentCityList,
       addCity,
       citiesWeatherForecast,
+      isLoadStorageData,
     }}>
       {children}
     </WeatherContext.Provider>
