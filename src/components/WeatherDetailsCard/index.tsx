@@ -41,7 +41,7 @@ export function WeatherDetailsCard({
   }
 
   return (
-    <TouchableOpacity onPress={onPress} disabled={Boolean(onPress)}>
+    <TouchableOpacity onPress={onPress} disabled={Boolean(!onPress)}>
       <Card style={styles.container}>
         <View style={styles.rowContainer}>
           <Label

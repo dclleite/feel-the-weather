@@ -1,5 +1,7 @@
-import React, { useContext, createContext, useState } from 'react'
+import React, { useContext, createContext, useState, useEffect } from 'react'
 import { getCities } from '../services/geodbApi'
+import { getStoreData, setStoreData } from '../services/storeApi'
+import { STORE_KEYS } from '../tokens'
 
 type WeatherContextData = {
   isTypingCityName: boolean,
@@ -10,6 +12,7 @@ type WeatherContextData = {
   searchCityName: string
   citiesFound: CityData[]
   currentCityList: CityData[]
+  setCurrentCityList: (list: CityData[]) => void
   addCity: (city: CityData) => void
 }
 
@@ -17,7 +20,7 @@ type WeatherProviderProps = {
   children: React.ReactNode
 }
 
-type CityData = {
+export type CityData = {
   city: string,
   country: string,
   countryCode: string,
@@ -57,11 +60,28 @@ function WeatherProvider({ children }: WeatherProviderProps) {
   }
 
   function addCity(city: CityData) {
-    setCurrentCityList([
-      ...currentCityList,
-      city,
-    ])
+    if(!currentCityList.some(currentCity => currentCity.id == city.id)) {
+      const newCurrentCityList = [
+        ...currentCityList,
+        city,
+      ]
+      setCurrentCityList(newCurrentCityList)
+      setStoreData(STORE_KEYS.CHOSEN_CITIES, newCurrentCityList)
+    }
+  
   }
+
+  useEffect(() => {
+    async function loadStorageData() {
+      const chosenCities = await getStoreData<CityData[]>(STORE_KEYS.CHOSEN_CITIES)
+
+      if(chosenCities?.length) {
+        setCurrentCityList(chosenCities)
+      }
+    }
+
+    loadStorageData()
+  }, [])
 
   return (
     <WeatherContext.Provider value={{
@@ -73,6 +93,7 @@ function WeatherProvider({ children }: WeatherProviderProps) {
       searchCityName,
       citiesFound,
       currentCityList,
+      setCurrentCityList,
       addCity,
     }}>
       {children}

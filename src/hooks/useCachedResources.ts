@@ -16,6 +16,7 @@ export default function useCachedResources() {
           'Roboto-Regular': require('../../assets/fonts/Roboto-Regular.ttf'),
           'Roboto-Medium': require('../../assets/fonts/Roboto-Medium.ttf')
         })
+
       } catch (e) {
         console.warn(e)
       } finally {
@@ -27,5 +28,5 @@ export default function useCachedResources() {
     loadResourcesAndDataAsync()
   }, [])
 
-  return isLoadingComplete
+  return isLoadingComplete 
 }
