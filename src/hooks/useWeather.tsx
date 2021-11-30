@@ -1,5 +1,6 @@
 import React, { useContext, createContext, useState, useEffect } from 'react'
 import { getCities } from '../services/geodbApi'
+import { getWeatherOneCall, WeatherOneCallResponse } from '../services/openWeatherApi'
 import { getStoreData, setStoreData } from '../services/storeApi'
 import { STORE_KEYS } from '../tokens'
 
@@ -12,8 +13,8 @@ type WeatherContextData = {
   searchCityName: string
   citiesFound: CityData[]
   currentCityList: CityData[]
-  setCurrentCityList: (list: CityData[]) => void
   addCity: (city: CityData) => void
+  citiesWeatherForecast: WeatherForecast[] 
 }
 
 type WeatherProviderProps = {
@@ -32,12 +33,18 @@ export type CityData = {
   regionCode: string,
 }
 
+export type WeatherForecast = {
+  city: CityData
+  weatherForecast: WeatherOneCallResponse
+}
+
 export const WeatherContext = createContext({} as WeatherContextData)
 
 function WeatherProvider({ children }: WeatherProviderProps) {
   const [searchCityName, setSearchCityName] = useState('')
   const [citiesFound, setCitiesFound] = useState<CityData[]>([])
   const [currentCityList, setCurrentCityList] = useState<CityData[]>([])
+  const [citiesWeatherForecast, setCitiesWeatherForecast] = useState<WeatherForecast[]>([])
 
   const [isTypingCityName, setIsTypingCityName] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
@@ -59,24 +66,67 @@ function WeatherProvider({ children }: WeatherProviderProps) {
     }
   }
 
-  function addCity(city: CityData) {
-    if(!currentCityList.some(currentCity => currentCity.id == city.id)) {
-      const newCurrentCityList = [
-        ...currentCityList,
-        city,
-      ]
-      setCurrentCityList(newCurrentCityList)
-      setStoreData(STORE_KEYS.CHOSEN_CITIES, newCurrentCityList)
+  async function getWeatherForecast(city: CityData) {
+    try {
+      const { data: weatherResponse } = await getWeatherOneCall({
+        lat: city.latitude, 
+        lon: city.longitude, 
+        units: 'metric', 
+        exclude: ['hourly', 'minutely'],
+        lang: 'pt_br'
+      })
+
+      const weatherForecast: WeatherForecast = {
+        city: {...city},
+        weatherForecast: weatherResponse
+      }
+
+      return weatherForecast
+    } catch (error) {
+      console.warn(error)
     }
-  
+  }
+
+  async function addCity(city: CityData) {
+    if(!currentCityList.some(currentCity => currentCity.id == city.id)) {
+
+      const weatherForecast = await getWeatherForecast(city)
+
+      if(weatherForecast) {
+        setCitiesWeatherForecast([
+          ...citiesWeatherForecast, 
+          weatherForecast
+        ])
+
+        const newCurrentCityList = [
+          ...currentCityList,
+          city,
+        ]
+
+        setCurrentCityList(newCurrentCityList)
+        setStoreData(STORE_KEYS.CHOSEN_CITIES, newCurrentCityList)
+      }
+    }
   }
 
   useEffect(() => {
     async function loadStorageData() {
-      const chosenCities = await getStoreData<CityData[]>(STORE_KEYS.CHOSEN_CITIES)
+      const currentCitiesListStorage = await getStoreData<CityData[]>(STORE_KEYS.CHOSEN_CITIES)
 
-      if(chosenCities?.length) {
-        setCurrentCityList(chosenCities)
+      if(currentCitiesListStorage?.length) {
+
+        currentCitiesListStorage.forEach(async (cityStorage) => {
+          const weatherForecast = await getWeatherForecast(cityStorage)
+
+          if(weatherForecast) {
+            setCitiesWeatherForecast((prevState) => [
+              ...prevState, 
+              weatherForecast
+            ])
+          }
+        })
+
+        setCurrentCityList(currentCitiesListStorage)
       }
     }
 
@@ -93,8 +143,8 @@ function WeatherProvider({ children }: WeatherProviderProps) {
       searchCityName,
       citiesFound,
       currentCityList,
-      setCurrentCityList,
       addCity,
+      citiesWeatherForecast,
     }}>
       {children}
     </WeatherContext.Provider>

@@ -1,9 +1,16 @@
 import * as React from 'react'
 import { useEffect, useState } from 'react'
 
-import { View, Text, TextInput, Keyboard, KeyboardAvoidingView, Platform, ScrollView, FlatList } from 'react-native'
+import { 
+  Text, 
+  TextInput, 
+  Keyboard, 
+  KeyboardAvoidingView, 
+  Platform, 
+  ScrollView, 
+  FlatList 
+} from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { CitySearchCard } from '../../components/CitySearchCard'
 import { TextInputBox } from '../../components/TextInputBox'
 import { WeatherDetailsCard } from '../../components/WeatherDetailsCard'
 import { useWeather } from '../../hooks/useWeather'
@@ -22,7 +29,7 @@ export function Home({ navigation }: NavigationProps){
     setIsTypingCityName, 
     isSearching, 
     searchCity, 
-    currentCityList
+    citiesWeatherForecast
   } = useWeather()
 
   useEffect(() => {
@@ -42,9 +49,8 @@ export function Home({ navigation }: NavigationProps){
     }
   }, [inputRef])
 
-
   function renderEmptyList() {
-    if(currentCityList.length === 0) {
+    if(citiesWeatherForecast.length === 0) {
       return (
         <ScrollView style={{paddingTop: 60}}> 
           <Text style={styles.primaryText}>
@@ -59,34 +65,28 @@ export function Home({ navigation }: NavigationProps){
   }
 
   function renderCards() {
-    if(currentCityList.length > 0) {
-
+    if(citiesWeatherForecast.length > 0) {
       return (
         <FlatList 
-          keyExtractor={item => String(item.id)}
-          data={currentCityList}
+          keyExtractor={item => String(item.city.id)}
+          data={citiesWeatherForecast}
           keyboardShouldPersistTaps='never'
-          renderItem={({item}) => (
-            <WeatherDetailsCard
-              primaryText={item.name}
-              secondaryText={item.country}
-            />
-          )}
+          renderItem={({item}) => {
+            const {city, weatherForecast } = item
+            const {current: currentWeather} = weatherForecast
+            return (
+              <WeatherDetailsCard
+                primaryText={city.name}
+                secondaryText={city.country}
+                curerentTemp={currentWeather.temp}
+                weatherDescription={currentWeather.weather[0].description}
+                tempMax={weatherForecast.daily[0].temp.max}
+                tempMin={weatherForecast.daily[0].temp.min}
+                showIcon
+              />
+            )
+          }}
         />
-      )
-
-      return (
-        <>
-          {currentCityList.map(city => (
-            //cards apenas de exemplo
-            <CitySearchCard 
-              key={city.id}
-              primaryText={city.name} 
-              secondaryText={city.country} 
-              onPress={() => console.log(city)} 
-            />
-          ))}
-        </>
       )
     }
   }
