@@ -19,12 +19,11 @@ export default function Navigation() {
           }}),
         }} 
         />
-        <Stack.Screen name="SearchScreen" component={SearchScreen} options={{ 
+        <Stack.Screen name="SearchScreen" component={SearchScreen} options={({navigation}: NavigationProps) => ({ 
           ...NavigationHeaderOptions({title: searchCityName, category:'close-button', onPress: () => {
-            // setIsSearching && setIsSearching(true)
+            navigation.navigate('Home')
           }}),
-          
-        }} 
+        })} 
         />
       </Stack.Navigator>
     </NavigationContainer>

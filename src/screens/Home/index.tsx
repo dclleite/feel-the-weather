@@ -1,10 +1,11 @@
 import * as React from 'react'
 import { useEffect, useState } from 'react'
 
-import { View, Text, TextInput, Keyboard, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
+import { View, Text, TextInput, Keyboard, KeyboardAvoidingView, Platform, ScrollView, FlatList } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { CitySearchCard } from '../../components/CitySearchCard'
 import { TextInputBox } from '../../components/TextInputBox'
+import { WeatherDetailsCard } from '../../components/WeatherDetailsCard'
 import { useWeather } from '../../hooks/useWeather'
 import { NavigationProps } from '../../navigation'
 
@@ -45,20 +46,35 @@ export function Home({ navigation }: NavigationProps){
   function renderEmptyList() {
     if(currentCityList.length === 0) {
       return (
-        <View style={{paddingTop: 60}}> 
+        <ScrollView style={{paddingTop: 60}}> 
           <Text style={styles.primaryText}>
               Parece que você ainda não adicionou uma cidade
           </Text>
           <Text style={styles.secondaryText}>
               Tente adicionar uma cidade usando o botão de busca
           </Text>
-        </View>
+        </ScrollView>
       )
     }
   }
 
   function renderCards() {
     if(currentCityList.length > 0) {
+
+      return (
+        <FlatList 
+          keyExtractor={item => String(item.id)}
+          data={currentCityList}
+          keyboardShouldPersistTaps='never'
+          renderItem={({item}) => (
+            <WeatherDetailsCard
+              primaryText={item.name}
+              secondaryText={item.country}
+            />
+          )}
+        />
+      )
+
       return (
         <>
           {currentCityList.map(city => (
@@ -101,13 +117,10 @@ export function Home({ navigation }: NavigationProps){
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView style={{ width: '100%'}}>  
-        {renderEmptyList()}
+    <SafeAreaView style={styles.container} edges={['bottom']} >
+      {renderEmptyList()}
 
-        {renderCards()}
-
-      </ScrollView>
+      {renderCards()}
       {renderTextInputBox()}
 
     </SafeAreaView>

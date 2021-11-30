@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { View } from 'react-native'
 
 import { Button } from '../Button'
 import { Card } from '../Card'
